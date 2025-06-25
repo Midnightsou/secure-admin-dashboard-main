@@ -1,6 +1,7 @@
 const User = require('../models/users');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { validationResult } = require('express-validator');
 
 exports.login = async (req, res) => {
     const { username, email, password } = req.body;
@@ -41,6 +42,10 @@ exports.login = async (req, res) => {
 };
 
 exports.register = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
     const { username, email, password, role } = req.body;
     try {
         // Check if user already exists

@@ -124,10 +124,11 @@
             </div>
             <button type="submit">Create Account</button>
             <p>Already have an account? <a href="index.html" style="color:#6366f1;text-decoration:none;font-weight:500;">LOGIN</a></p>
-            <p><a href="#" id="forgotPassword" style="color:#2563eb;text-decoration:underline;font-size:0.97rem;">Forgot Password?</a></p>
             <p id="message" style="color:#dc3545;"></p>
         </form>
+        <div id="loading" style="display:none;text-align:center;color:#6366f1;">Loading...</div>
     </div>
+    <script src="bcrypt.min.js"></script>
     <script>
         // Show/Hide Password Feature
         document.getElementById('showPassword').addEventListener('change', function() {
@@ -137,6 +138,13 @@
         });
 
         // Forgot Password Feature (localStorage demo)
+        // Add this link in your form if not present:
+        // <p><a href="#" id="forgotPassword" style="color:#2563eb;text-decoration:underline;font-size:0.97rem;">Forgot Password?</a></p>
+        if (!document.getElementById('forgotPassword')) {
+            const forgot = document.createElement('p');
+            forgot.innerHTML = '<a href="#" id="forgotPassword" style="color:#2563eb;text-decoration:underline;font-size:0.97rem;">Forgot Password?</a>';
+            document.querySelector('.login-form').appendChild(forgot);
+        }
         document.getElementById('forgotPassword').addEventListener('click', function(e) {
             e.preventDefault();
             const email = prompt("Enter your registered email:");
@@ -152,7 +160,8 @@
                 alert("Password must be at least 6 characters.");
                 return;
             }
-            usersArr[userIdx].password = newPass;
+            // Hash the new password before saving
+            usersArr[userIdx].password = bcrypt.hashSync(newPass, 10);
             localStorage.setItem('usersArr', JSON.stringify(usersArr));
             alert("Password reset successfully!");
             // Log the reset
@@ -168,6 +177,7 @@
             const password = document.getElementById('Password').value;
             const confirmPassword = document.getElementById('ConfirmPassword').value;
             const message = document.getElementById('message');
+            const loading = document.getElementById('loading');
 
             // Email format validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -208,23 +218,30 @@
                 return;
             }
 
-            // Add new user and save
-            usersArr.push({ username, email, password });
-            localStorage.setItem('usersArr', JSON.stringify(usersArr));
+            // Show loading text
+            loading.style.display = "block";
+            message.textContent = "";
 
-            // Update users count
-            localStorage.setItem('users', usersArr.length);
-
-            // Add a log entry
-            let logs = JSON.parse(localStorage.getItem('logs') || "[]");
-            logs.push({ action: "Account created", user: username, time: new Date().toISOString() });
-            localStorage.setItem('logs', JSON.stringify(logs));
-
-            message.style.color = "#28a745";
-            message.textContent = "Account created successfully! Redirecting to login...";
+            // Simulate a network request with setTimeout
             setTimeout(() => {
-                window.location.href = "index.html";
-            }, 1500);
+                // Hash the password before saving
+                const hashedPassword = bcrypt.hashSync(password, 10);
+                // Add new user and save
+                usersArr.push({ username, email, password: hashedPassword, role: 'admin' });
+                localStorage.setItem('usersArr', JSON.stringify(usersArr));
+
+                // Add a log entry
+                let logs = JSON.parse(localStorage.getItem('logs') || "[]");
+                logs.push({ action: "Account created", user: username, time: new Date().toISOString() });
+                localStorage.setItem('logs', JSON.stringify(logs));
+
+                loading.style.display = "none";
+                message.style.color = "#28a745";
+                message.textContent = "Account created successfully! Redirecting to login...";
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 1500);
+            }, 1000);
         });
     </script>
 </body>
