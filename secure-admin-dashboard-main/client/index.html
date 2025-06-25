@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card {
+            background: #fff;
+            padding: 2.5rem 2rem 2rem 2rem;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+            width: 120%;
+            max-width: 350px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .login-form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .login-form h2 {
+            margin-bottom: 0.5rem;
+            color: #22223b;
+            font-weight: 600;
+            text-align: center;
+        }
+        .input-group {
+            position: relative;
+            width: 100%;
+        }
+        .input-group input {
+            width: 80%;
+            padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #f1f5f9;
+            font-size: 1rem;
+            transition: border 0.2s;
+        }
+        .input-group input:focus {
+            border: 1.5px solid #6366f1;
+            outline: none;
+            background: #fff;
+        }
+        .input-group .fa-solid {
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6366f1;
+            font-size: 1.1rem;
+        }
+        .login-form button {
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(90deg, #6366f1 0%, #60a5fa 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 0.5rem;
+        }
+        .login-form button:hover {
+            background: linear-gradient(90deg, #4f46e5 0%, #2563eb 100%);
+        }
+        .login-form p {
+            text-align: center;
+            margin: 0.5rem 0 0 0;
+            font-size: 0.97rem;
+        }
+        #login-message {
+            min-height: 1.2em;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+        @media (max-width: 480px) {
+            .card {
+                padding: 1.5rem 0.7rem 1.5rem 0.7rem;
+                max-width: 98vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <form class="login-form" id="loginForm" autocomplete="off">
+            <h2>Admin Login</h2>
+            <div class="input-group">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" placeholder="Username" id="Username" required/>
+            </div>
+            <div class="input-group">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="text" placeholder="Email" id="Email" required/>
+            </div>
+            <div class="input-group">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" placeholder="Password" id="Password" required/>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:-8px;">
+                <input type="checkbox" id="showPassword" style="width:auto;">
+                <label for="showPassword" style="font-size:0.97rem;cursor:pointer;">Show Password</label>
+            </div>
+            <button type="submit">LOGIN</button>
+            <p>Don't have an account? <a href="create-account.html" style="color:#6366f1;text-decoration:none;font-weight:500;">Create one</a></p>
+            <p><a href="#" id="forgotPassword" style="color:#2563eb;text-decoration:underline;font-size:0.97rem;">Forgot Password?</a></p>
+            <p id="login-message" style="color:#dc3545;"></p>
+        </form>
+    </div>
+    <script>
+        // Show/Hide Password Feature
+        document.getElementById('showPassword').addEventListener('change', function() {
+            const pwd = document.getElementById('Password');
+            pwd.type = this.checked ? 'text' : 'password';
+        });
+
+        // Forgot Password Feature (localStorage demo)
+        document.getElementById('forgotPassword').addEventListener('click', function(e) {
+            e.preventDefault();
+            const email = prompt("Enter your registered email:");
+            if (!email) return;
+            let usersArr = JSON.parse(localStorage.getItem('usersArr') || "[]");
+            const userIdx = usersArr.findIndex(u => u.email === email);
+            if (userIdx === -1) {
+                alert("No account found with that email.");
+                return;
+            }
+            const newPass = prompt("Enter your new password (min 6 characters):");
+            if (!newPass || newPass.length < 6) {
+                alert("Password must be at least 6 characters.");
+                return;
+            }
+            usersArr[userIdx].password = newPass;
+            localStorage.setItem('usersArr', JSON.stringify(usersArr));
+            alert("Password reset successfully!");
+            // Log the reset
+            let logs = JSON.parse(localStorage.getItem('logs') || "[]");
+            logs.push({ action: "Password reset (forgot)", user: usersArr[userIdx].username, time: new Date().toISOString() });
+            localStorage.setItem('logs', JSON.stringify(logs));
+        });
+
+        // Login logic (unchanged)
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('Username').value.trim();
+            const email = document.getElementById('Email').value.trim();
+            const password = document.getElementById('Password').value;
+            const message = document.getElementById('login-message');
+
+            // Email format validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!username || !email || !password) {
+                message.style.color = "#dc3545";
+                message.textContent = "All fields are required.";
+                return;
+            }
+            if (!emailRegex.test(email)) {
+                message.style.color = "#dc3545";
+                message.textContent = "Please enter a valid email address.";
+                return;
+            }
+            if (password.length < 6) {
+                message.style.color = "#dc3545";
+                message.textContent = "Password must be at least 6 characters.";
+                return;
+            }
+
+            // Get users array from localStorage
+            const usersArr = JSON.parse(localStorage.getItem('usersArr') || "[]");
+            const user = usersArr.find(u => u.username === username && u.email === email && u.password === password);
+
+            if (user) {
+                // Store current user in localStorage
+                localStorage.setItem('currentUser', JSON.stringify(user));
+
+                // Add a log entry for login
+                let logs = JSON.parse(localStorage.getItem('logs') || "[]");
+                logs.push({ action: "Login", user: username, time: new Date().toISOString() });
+                localStorage.setItem('logs', JSON.stringify(logs));
+
+                message.style.color = "#28a745";
+                message.textContent = "Login successful! Redirecting...";
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 1200);
+            } else {
+                message.style.color = "#dc3545";
+                message.textContent = "Invalid username, email, or password.";
+            }
+        });
+    </script>
+</body>
+</html>
