@@ -1,255 +1,321 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Settings | Admin</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-    <style>
-        body { margin:0; font-family:'Segoe UI',Arial,sans-serif; background:#f4f6fb; }
-        .dashboard { display:flex; min-height:100vh; }
-        .sidebar {
-            width: 220px;
-            background: #23272b;
-            color: #fff;
-            padding: 32px 0 0 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .sidebar h2 {
-            margin-bottom: 36px;
-            font-size: 2rem;
-            letter-spacing: 2px;
-        }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-            width: 100%;
-            margin: 0;
-        }
-        .sidebar ul li a {
-            display: block;
-            padding: 16px 36px;
-            color: #fff;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background 0.2s, color 0.2s;
-            border-left: 4px solid transparent;
-        }
-        .sidebar ul li a.active,
-        .sidebar ul li a:hover {
-            background: #181b1f;
-            color: #60a5fa;
-            border-left: 4px solid #60a5fa;
-        }
-        .sidebar ul li a.logout {
-            color: #dc3545;
-        }
-        .main-content {
-            flex: 1;
-            padding: 40px;
-        }
-        .navbar {
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .navbar h1 {
-            margin: 0;
-            font-size: 2.2rem;
-            color: #23272b;
-        }
-        .settings-section {
-            background: #fff;
-            padding: 32px 28px;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            max-width: 500px;
-            margin: 0 auto;
-        }
-        .settings-section h2 {
-            margin-top: 0;
-            color: #6366f1;
-            font-size: 1.3rem;
-            margin-bottom: 18px;
-        }
-        .settings-section label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            color: #23272b;
-        }
-        .settings-section input[type="password"], .settings-section select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 7px;
-            border: 1px solid #cbd5e1;
-            margin-bottom: 18px;
-            font-size: 1rem;
-            background: #f8fafc;
-        }
-        .settings-section button {
-            padding: 10px 22px;
-            background: #6366f1;
-            color: #fff;
-            border: none;
-            border-radius: 7px;
-            font-size: 1.05rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .settings-section button:hover {
-            background: #4f46e5;
-        }
-        .settings-section .success {
-            color: #28a745;
-            margin-bottom: 10px;
-        }
-        .settings-section .error {
-            color: #dc3545;
-            margin-bottom: 10px;
-        }
-        @media (max-width: 900px) {
-            .main-content {
-                padding: 20px;
-            }
-            .settings-section {
-                padding: 18px 6px;
-            }
-        }
-        @media (max-width: 600px) {
-            .dashboard {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-                flex-direction: row;
-                justify-content: space-between;
-                padding: 12px 0;
-            }
-            .sidebar h2 {
-                font-size: 1.2rem;
-                margin-bottom: 0;
-                margin-left: 18px;
-            }
-            .sidebar ul {
-                display: flex;
-                flex-direction: row;
-                width: auto;
-            }
-            .sidebar ul li {
-                margin: 0 4px;
-            }
-            .sidebar ul li a {
-                padding: 10px 12px;
-                font-size: 0.97rem;
-                border-left: none;
-                border-bottom: 2px solid transparent;
-            }
-            .sidebar ul li a.active,
-            .sidebar ul li a:hover {
-                border-left: none;
-                border-bottom: 2px solid #60a5fa;
-            }
-            .main-content {
-                padding: 8px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Settings | Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <script src="bcrypt.min.js"></script> <!-- Make sure this exists in your project -->
+  <style>
+    body { margin:0; font-family:'Segoe UI',Arial,sans-serif; background:#f4f6fb; }
+    .dashboard { display:flex; min-height:100vh; }
+    .sidebar {
+      width: 220px;
+      background: #23272b;
+      color: #fff;
+      padding: 32px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .sidebar h2 {
+      margin-bottom: 36px;
+      font-size: 2rem;
+      letter-spacing: 2px;
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      width: 100%;
+      margin: 0;
+    }
+    .sidebar ul li a {
+      display: block;
+      padding: 16px 36px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background 0.2s, color 0.2s;
+      border-left: 4px solid transparent;
+    }
+    .sidebar ul li a.active,
+    .sidebar ul li a:hover {
+      background: #181b1f;
+      color: #60a5fa;
+      border-left: 4px solid #60a5fa;
+    }
+    .sidebar ul li a.logout {
+      color: #dc3545;
+    }
+    .main-content {
+      flex: 1;
+      padding: 40px;
+    }
+    .navbar {
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .navbar h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      color: #23272b;
+    }
+    .settings-section {
+      background: #fff;
+      padding: 32px 28px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .settings-section h2 {
+      margin-top: 0;
+      color: #6366f1;
+      font-size: 1.3rem;
+      margin-bottom: 18px;
+    }
+    .settings-section label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #23272b;
+    }
+    .settings-section input[type="password"],
+    .settings-section input[type="text"],
+    .settings-section input[type="email"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 7px;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 18px;
+      font-size: 1rem;
+      background: #f8fafc;
+    }
+    .settings-section button {
+      padding: 10px 22px;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .settings-section button:hover {
+      background: #4f46e5;
+    }
+    .settings-section .success {
+      color: #28a745;
+      margin-bottom: 10px;
+    }
+    .settings-section .error {
+      color: #dc3545;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 900px) {
+      .main-content {
+        padding: 20px;
+      }
+      .settings-section {
+        padding: 18px 6px;
+      }
+    }
+    @media (max-width: 600px) {
+      .dashboard {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 12px 0;
+      }
+      .sidebar h2 {
+        font-size: 1.2rem;
+        margin-bottom: 0;
+        margin-left: 18px;
+      }
+      .sidebar ul {
+        display: flex;
+        flex-direction: row;
+        width: auto;
+      }
+      .sidebar ul li {
+        margin: 0 4px;
+      }
+      .sidebar ul li a {
+        padding: 10px 12px;
+        font-size: 0.97rem;
+        border-left: none;
+        border-bottom: 2px solid transparent;
+      }
+      .sidebar ul li a.active,
+      .sidebar ul li a:hover {
+        border-left: none;
+        border-bottom: 2px solid #60a5fa;
+      }
+      .main-content {
+        padding: 8px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="dashboard">
-        <aside class="sidebar">
-            <h2>Admin</h2>
-            <ul>
-                <li><a href="dashboard.html">Dashboard</a></li>
-                <li><a href="users.html">Users</a></li>
-                <li><a href="logs.html">Logs</a></li>
-                <li><a href="settings.html" class="active">Settings</a></li>
-                <li><a href="#" id="logout" class="logout">Logout</a></li>
-            </ul>
-        </aside>
-        <main class="main-content">
-            <header class="navbar">
-                <h1>Settings</h1>
-            </header>
-            <section class="settings-section">
-                <h2>Change Password</h2>
-                <div id="settings-message"></div>
-                <form id="changePasswordForm" autocomplete="off">
-                    <label for="currentPassword">Current Password</label>
-                    <input type="password" id="currentPassword" required>
-                    <label for="newPassword">New Password</label>
-                    <input type="password" id="newPassword" required>
-                    <label for="confirmPassword">Confirm New Password</label>
-                    <input type="password" id="confirmPassword" required>
-                    <button type="submit">Update Password</button>
-                </form>
-            </section>
-        </main>
-    </div>
-    <script>
-        // Redirect if not logged in
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || "null");
-        if (!currentUser) window.location.href = "index.html";
+  <div class="dashboard">
+    <aside class="sidebar">
+      <h2>Admin</h2>
+      <ul>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="users.html">Users</a></li>
+        <li><a href="logs.html">Logs</a></li>
+        <li><a href="settings.html" class="active">Settings</a></li>
+        <li><a href="#" id="logout" class="logout">Logout</a></li>
+      </ul>
+    </aside>
+    <main class="main-content">
+      <header class="navbar">
+        <h1>Settings</h1>
+      </header>
 
-        // Logout handler
-        document.getElementById('logout').onclick = function(e) {
-            e.preventDefault();
-            localStorage.removeItem('currentUser');
-            window.location.href = "index.html";
-        };
+      <section class="settings-section">
+        <h2>Update Settings</h2>
+        <div id="settings-message"></div>
 
-        // Change password logic (localStorage demo)
-        document.getElementById('changePasswordForm').onsubmit = function(e) {
-            e.preventDefault();
-            const currentPassword = document.getElementById('currentPassword').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const messageDiv = document.getElementById('settings-message');
+        <!-- Update Username -->
+        <form id="updateUsernameForm">
+          <label for="newUsername">New Username</label>
+          <input type="text" id="newUsername" required>
+          <button type="submit">Update Username</button>
+        </form>
 
-            if (!currentPassword || !newPassword || !confirmPassword) {
-                messageDiv.textContent = "All fields are required.";
-                messageDiv.className = "error";
-                return;
-            }
-            if (newPassword !== confirmPassword) {
-                messageDiv.textContent = "New passwords do not match.";
-                messageDiv.className = "error";
-                return;
-            }
-            if (newPassword.length < 6) {
-                messageDiv.textContent = "Password must be at least 6 characters.";
-                messageDiv.className = "error";
-                return;
-            }
-            // Check current password
-            let usersArr = JSON.parse(localStorage.getItem('usersArr') || "[]");
-            const idx = usersArr.findIndex(u => u.username === currentUser.username && u.email === currentUser.email);
-            if (idx === -1 || usersArr[idx].password !== currentPassword) {
-                messageDiv.textContent = "Current password is incorrect.";
-                messageDiv.className = "error";
-                return;
-            }
-            // Update password
-            usersArr[idx].password = newPassword;
-            localStorage.setItem('usersArr', JSON.stringify(usersArr));
-            // Update currentUser in localStorage
-            currentUser.password = newPassword;
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            messageDiv.textContent = "Password updated successfully!";
-            messageDiv.className = "success";
+        <!-- Update Email -->
+        <form id="updateEmailForm">
+          <label for="newEmail">New Email</label>
+          <input type="email" id="newEmail" required>
+          <button type="submit">Update Email</button>
+        </form>
 
-            // Log the change
-            let logs = JSON.parse(localStorage.getItem('logs') || "[]");
-            logs.push({ action: "Password changed", user: currentUser.username, time: new Date().toISOString() });
-            localStorage.setItem('logs', JSON.stringify(logs));
+        <!-- Update Password -->
+        <form id="changePasswordForm" autocomplete="off">
+          <label for="currentPassword">Current Password</label>
+          <input type="password" id="currentPassword" required>
+          <label for="newPassword">New Password</label>
+          <input type="password" id="newPassword" required>
+          <label for="confirmPassword">Confirm New Password</label>
+          <input type="password" id="confirmPassword" required>
+          <button type="submit">Update Password</button>
+        </form>
+      </section>
+    </main>
+  </div>
 
-            // Clear fields
-            document.getElementById('currentPassword').value = '';
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
-        };
+  <script>
+    // Auth check
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || "null");
+    if (!currentUser) window.location.href = "index.html";
+
+    // Logout
+    document.getElementById('logout').onclick = function(e) {
+      e.preventDefault();
+      localStorage.removeItem('currentUser');
+      window.location.href = "index.html";
+    };
+
+    // Utility
+    function showMessage(msg, type) {
+      const div = document.getElementById('settings-message');
+      div.textContent = msg;
+      div.className = type;
+      setTimeout(() => {
+        div.textContent = '';
+        div.className = '';
+      }, 3500);
+    }
+
+    function logChange(action) {
+      const logs = JSON.parse(localStorage.getItem('logs') || "[]");
+      logs.push({ action, user: currentUser.username, time: new Date().toISOString() });
+      localStorage.setItem('logs', JSON.stringify(logs));
+    }
+
+    // Update Username
+    document.getElementById('updateUsernameForm').onsubmit = function(e) {
+      e.preventDefault();
+      const newUsername = document.getElementById('newUsername').value.trim();
+      if (!newUsername) return showMessage("Username cannot be empty.", "error");
+
+      let users = JSON.parse(localStorage.getItem('usersArr') || "[]");
+      if (users.some(u => u.username === newUsername && u.email !== currentUser.email)) {
+        return showMessage("Username already taken.", "error");
+      }
+
+      const idx = users.findIndex(u => u.email === currentUser.email);
+      users[idx].username = newUsername;
+      currentUser.username = newUsername;
+
+      localStorage.setItem('usersArr', JSON.stringify(users));
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      logChange("Username updated");
+      showMessage("Username updated successfully!", "success");
+      document.getElementById('newUsername').value = '';
+    };
+
+    // Update Email
+    document.getElementById('updateEmailForm').onsubmit = function(e) {
+      e.preventDefault();
+      const newEmail = document.getElementById('newEmail').value.trim();
+      if (!newEmail) return showMessage("Email cannot be empty.", "error");
+
+      let users = JSON.parse(localStorage.getItem('usersArr') || "[]");
+      if (users.some(u => u.email === newEmail && u.username !== currentUser.username)) {
+        return showMessage("Email already in use.", "error");
+      }
+
+      const idx = users.findIndex(u => u.username === currentUser.username);
+      users[idx].email = newEmail;
+      currentUser.email = newEmail;
+
+      localStorage.setItem('usersArr', JSON.stringify(users));
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      logChange("Email updated");
+      showMessage("Email updated successfully!", "success");
+      document.getElementById('newEmail').value = '';
+    };
+
+    // Update Password
+    document.getElementById('changePasswordForm').onsubmit = function(e) {
+      e.preventDefault();
+      const currentPwd = document.getElementById('currentPassword').value;
+      const newPwd = document.getElementById('newPassword').value;
+      const confirmPwd = document.getElementById('confirmPassword').value;
+
+      if (!currentPwd || !newPwd || !confirmPwd) return showMessage("All fields required.", "error");
+      if (newPwd !== confirmPwd) return showMessage("New passwords do not match.", "error");
+      if (newPwd.length < 6) return showMessage("Password must be at least 6 characters.", "error");
+
+      let users = JSON.parse(localStorage.getItem('usersArr') || "[]");
+      const idx = users.findIndex(u => u.email === currentUser.email);
+
+      if (idx === -1 || !bcrypt.compareSync(currentPwd, users[idx].password)) {
+        return showMessage("Current password incorrect.", "error");
+      }
+
+      const hashed = bcrypt.hashSync(newPwd, 10);
+      users[idx].password = hashed;
+      currentUser.password = hashed;
+
+      localStorage.setItem('usersArr', JSON.stringify(users));
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      logChange("Password updated");
+      showMessage("Password updated successfully!", "success");
+
+      document.getElementById('currentPassword').value = '';
+      document.getElementById('newPassword').value = '';
+      document.getElementById('confirmPassword').value = '';
+    };
+  </script>
+</body>
+</html>

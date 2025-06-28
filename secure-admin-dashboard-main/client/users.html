@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
-    body {
+body {
       margin: 0;
       font-family: 'Segoe UI', Arial, sans-serif;
       background: #f4f6fb;
@@ -217,7 +217,7 @@
         margin: 30% auto;
       }
     }
-  </style>
+     </style>
 </head>
 <body>
   <div class="dashboard">
@@ -226,8 +226,8 @@
       <ul>
         <li><a href="dashboard.html">Dashboard</a></li>
         <li><a href="users.html" class="active">Users</a></li>
-        <li><a href="#">Logs</a></li>
-        <li><a href="#">Settings</a></li>
+        <li><a href="logs.html">Logs</a></li>
+        <li><a href="settings.html">Settings</a></li>
         <li><a href="#" id="logout" class="logout">Logout</a></li>
       </ul>
     </aside>
@@ -239,169 +239,146 @@
         <table id="users-table">
           <thead>
             <tr>
-              <th>Username</th>
-              <th>Role</th>
-              <th>Created At</th>
-              <th>Action</th>
+              <th>Username</th><th>Email</th><th>Role</th><th>Created At</th><th>Action</th>
             </tr>
           </thead>
           <tbody id="user-list"></tbody>
         </table>
-        <!-- Edit Modal -->
+        <!-- Edit / Reset Modal -->
         <div id="editModal" class="modal">
           <div class="modal-content">
             <h3>Edit User</h3>
-            <input type="text" id="edit-username" placeholder="Username" />
+            <input type="text" id="edit-username" placeholder="Username"/>
+            <input type="email" id="edit-email" placeholder="Email"/>
             <select id="edit-role">
               <option value="admin">Admin</option>
               <option value="user">User</option>
             </select>
             <button id="saveEdit" class="save-btn">Save</button>
+            <button id="resetPwd" class="action-btn">Reset Password</button>
             <button id="cancelEdit" class="cancel-btn">Cancel</button>
           </div>
         </div>
       </section>
     </main>
   </div>
-  <script>
-    // Redirect to login if not authenticated
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || "null");
-    if (!currentUser) {
-      window.location.href = "index.html";
-    }
 
-    // Logout handler
-    document.getElementById('logout').onclick = function(e) {
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+  <script>
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) window.location.href = "index.html";
+
+    document.getElementById('logout').onclick = e => {
       e.preventDefault();
       localStorage.removeItem('currentUser');
-      window.location.href = 'index.html';
+      window.location.href = "index.html";
     };
 
-    // Helper: format date
-    function formatDate(dateStr) {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString() + " " + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    function formatDate(d) {
+      const dt = new Date(d);
+      return dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
     }
 
-    // Load users from localStorage
     function getUsers() {
       return JSON.parse(localStorage.getItem('usersArr') || "[]");
     }
-    function saveUsers(users) {
-      localStorage.setItem('usersArr', JSON.stringify(users));
+    function saveUsers(arr) {
+      localStorage.setItem('usersArr', JSON.stringify(arr));
+    }
+    function log(action,user) {
+      const logs=JSON.parse(localStorage.getItem('logs')||"[]");
+      logs.push({action,user,time:new Date().toISOString()});
+      localStorage.setItem('logs',JSON.stringify(logs));
     }
 
-    // Render users table
-    function renderUsers() {
-      const users = getUsers();
-      const tbody = document.getElementById('user-list');
-      tbody.innerHTML = '';
-      if (users.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" style="color:#888;text-align:center;">No users found.</td></tr>`;
-        return;
-      }
-      users.forEach((user, idx) => {
-        // Add createdAt and role if missing (for legacy data)
-        if (!user.createdAt) user.createdAt = new Date().toISOString();
-        if (!user.role) user.role = "admin";
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${user.username}</td>
-          <td>${user.role.charAt(0).toUpperCase() + user.role.slice(1)}</td>
-          <td>${formatDate(user.createdAt)}</td>
-          <td>
-            <button class="action-btn edit" data-idx="${idx}"><i class="fa fa-edit"></i> Edit</button>
-            <button class="action-btn delete" data-idx="${idx}"><i class="fa fa-trash"></i> Delete</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-      addTableEventListeners();
+    function renderUsers(){
+      const users=getUsers();
+      const tbody=document.getElementById('user-list');
+      tbody.innerHTML = users.length
+        ? users.map((u,i)=>`
+            <tr>
+              <td>${u.username}</td>
+              <td>${u.email}</td>
+              <td>${u.role}</td>
+              <td>${formatDate(u.createdAt)}</td>
+              <td>
+                <button class="action-btn edit" data-idx="${i}"><i class="fa fa-edit"></i> Edit</button>
+                <button class="action-btn delete" data-idx="${i}"><i class="fa fa-trash"></i> Delete</button>
+              </td>
+            </tr>`).join('')
+        : `<tr><td colspan="5" style="text-align:center;color:#888">No users found.</td></tr>`;
+      attachEvents();
     }
 
-    // Add event listeners for edit/delete
-    function addTableEventListeners() {
-      document.querySelectorAll('.action-btn.edit').forEach(btn => {
-        btn.onclick = function() {
-          const idx = this.getAttribute('data-idx');
-          openEditModal(idx);
-        };
-      });
-      document.querySelectorAll('.action-btn.delete').forEach(btn => {
-        btn.onclick = function() {
-          const idx = this.getAttribute('data-idx');
-          if (confirm('Are you sure you want to delete this user?')) {
-            deleteUser(idx);
-          }
-        };
+
+    function attachEvents(){
+      document.querySelectorAll('.edit').forEach(b=>b.onclick=e=>openModal(e.target.closest('button').dataset.idx));
+      document.querySelectorAll('.delete').forEach(b=>b.onclick=e=>{
+        const i=e.target.closest('button').dataset.idx;
+        const users=getUsers();
+        if(confirm(`Delete user "${users[i].username}"?`)){
+          const removed=users.splice(i,1)[0];
+          saveUsers(users);
+          log('User deleted',removed.username);
+          renderUsers();
+        }
       });
     }
 
-    // Edit Modal logic
-    let editingIdx = null;
-    function openEditModal(idx) {
-      const users = getUsers();
-      editingIdx = idx;
-      document.getElementById('edit-username').value = users[idx].username;
-      document.getElementById('edit-role').value = users[idx].role || "admin";
-      document.getElementById('editModal').style.display = 'block';
+
+    let activeIdx;
+    function openModal(idx){
+      activeIdx=idx;
+      const u=getUsers()[idx];
+      document.getElementById('edit-username').value=u.username;
+      document.getElementById('edit-email').value=u.email;
+      document.getElementById('edit-role').value=u.role;
+      document.getElementById('editModal').style.display='block';
     }
-    function closeModal() {
-      document.getElementById('editModal').style.display = 'none';
-      editingIdx = null;
+
+
+    function closeModal(){
+      document.getElementById('editModal').style.display='none';
+      activeIdx=null;
     }
+
     document.getElementById('cancelEdit').onclick = closeModal;
 
-    // Save edited user
-    document.getElementById('saveEdit').onclick = function() {
-      const users = getUsers();
-      const username = document.getElementById('edit-username').value.trim();
-      const role = document.getElementById('edit-role').value;
-      if (!username) {
-        alert('Username cannot be empty.');
-        return;
+    document.getElementById('saveEdit').onclick = () => {
+      const users=getUsers();
+      const idx=activeIdx;
+      const u=users[idx];
+      const nu=document.getElementById('edit-username').value.trim();
+      const ne=document.getElementById('edit-email').value.trim();
+      const nr=document.getElementById('edit-role').value;
+
+      if(!nu||!ne){return alert("All fields required.");}
+      if(users.some((o,i)=>i!=idx&&(o.username===nu||o.email===ne))){
+        return alert("Username or email taken.");
       }
-      // Prevent duplicate usernames
-      if (users.some((u, i) => u.username === username && i != editingIdx)) {
-        alert('Username already exists.');
-        return;
-      }
-      users[editingIdx].username = username;
-      users[editingIdx].role = role;
+      u.username=nu; u.email=ne; u.role=nr;
       saveUsers(users);
-
-      // Log the edit
-      let logs = JSON.parse(localStorage.getItem('logs') || "[]");
-      logs.push({ action: "User edited", user: username, time: new Date().toISOString() });
-      localStorage.setItem('logs', JSON.stringify(logs));
-
-      closeModal();
-      renderUsers();
+      log('User edited',nu);
+      if(currentUser.email===getUsers()[idx].email){ localStorage.setItem('currentUser', JSON.stringify(u)); }
+      closeModal(); renderUsers();
     };
 
-    // Delete user
-    function deleteUser(idx) {
-      const users = getUsers();
-      const deletedUser = users.splice(idx, 1)[0];
+
+    document.getElementById('resetPwd').onclick = () => {
+      const newPwd = prompt("Set temporary password (min 6 chars):");
+      if(!newPwd || newPwd.length<6) return alert("Invalid password.");
+      const users=getUsers(), u=users[activeIdx];
+      u.password = bcrypt.hashSync(newPwd,10);
       saveUsers(users);
-
-      // Log the deletion
-      let logs = JSON.parse(localStorage.getItem('logs') || "[]");
-      logs.push({ action: "User deleted", user: deletedUser.username, time: new Date().toISOString() });
-      localStorage.setItem('logs', JSON.stringify(logs));
-
-      renderUsers();
-    }
-
-    // Close modal on outside click
-    window.onclick = function(event) {
-      const modal = document.getElementById('editModal');
-      if (event.target == modal) {
-        closeModal();
-      }
+      log('Password reset',u.username);
+      alert(`New password for "${u.username}" set successfully.`);
+      closeModal(); renderUsers();
     };
 
-    // Initial render
+    window.onclick = e => {
+      if(e.target.id==='editModal') closeModal();
+    };
+
     renderUsers();
   </script>
 </body>
