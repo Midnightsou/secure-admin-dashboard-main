@@ -104,6 +104,9 @@
         <i class="fa-solid fa-lock"></i>
         <input type="password" placeholder="Password" id="Password" required/>
       </div>
+      <div id="strengthMeter" style="height:6px;width:100%;background:#eee;border-radius:3px;margin-bottom:8px;">
+        <div id="strengthBar" style="height:100%;width:0%;background:#dc3545;border-radius:3px;transition:width 0.3s,background 0.3s;"></div>
+      </div>
 
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:-8px;">
         <input type="checkbox" id="showPassword" style="width:auto;">
@@ -174,35 +177,89 @@
       const usersArr = JSON.parse(localStorage.getItem('usersArr') || "[]");
       const user = usersArr.find(u => u.username === username && u.email === email);
 
-      {
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        let logs = JSON.parse(localStorage.getItem('logs') || "[]");
-        logs.push({ action: "Login", user: username, time: new Date().toISOString() });
-        localStorage.setItem('logs', JSON.stringify(logs));
+      if (!user) {
+        message.textContent = "Invalid username or email.";
+        return;
+      }
 
-        message.style.color = "#28a745";
-        message.textContent = "Login successful! Redirecting...";
-        setTimeout(() => {
-          window.location.href = "dashboard.html";
-        }, 1200);
-      } 
-        message.style.color = "#dc3545";
-        message.textContent = "Invalid username, email, or password.";
-      
+      // Initialize lockout fields if missing
+      user.failedAttempts = user.failedAttempts || 0;
+      user.lockoutUntil = user.lockoutUntil || null;
+
+      // Check for lockout
+      if (user.lockoutUntil && new Date() < new Date(user.lockoutUntil)) {
+        const mins = Math.ceil((new Date(user.lockoutUntil) - new Date()) / 60000);
+        message.textContent = `Account locked. Try again in ${mins} minute(s).`;
+        return;
+      }
+
+      // Check password
+      if (!bcrypt.compareSync(password, user.password)) {
+        user.failedAttempts += 1;
+        if (user.failedAttempts >= 5) {
+          user.lockoutUntil = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+          message.textContent = "Account locked due to too many failed attempts. Try again in 5 minutes.";
+        } else {
+          message.textContent = `Incorrect password. ${5 - user.failedAttempts} attempt(s) left.`;
+        }
+        // Save updates
+        localStorage.setItem('usersArr', JSON.stringify(usersArr));
+        return;
+      }
+
+      // Successful login
+      user.failedAttempts = 0;
+      user.lockoutUntil = null;
+      localStorage.setItem('usersArr', JSON.stringify(usersArr));
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      let logs = JSON.parse(localStorage.getItem('logs') || "[]");
+      logs.push({ action: "Login", user: username, time: new Date().toISOString() });
+      localStorage.setItem('logs', JSON.stringify(logs));
+
+      message.style.color = "#28a745";
+      message.textContent = "Login successful! Redirecting...";
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 1200);
     });
 
-    // Utility: Run once manually in console to create test user
-    /*
-    function createTestUser() {
-      const usersArr = [{
-        username: "admin",
-        email: "admin@example.com",
-        password: bcrypt.hashSync("password123", 10)
-      }];
-      localStorage.setItem("usersArr", JSON.stringify(usersArr));
-      console.log("Test user created: admin / admin@example.com / password123");
-    }
-    */
+    // Password Strength Meter
+const passwordInput = document.getElementById('Password');
+const strengthBar = document.getElementById('strengthBar');
+
+passwordInput.addEventListener('input', function () {
+  const val = passwordInput.value;
+  let score = 0;
+  if (val.length >= 6) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[a-z]/.test(val)) score++;
+  if (/\d/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+
+  // Set bar width and color
+  const percent = (score / 5) * 100;
+  strengthBar.style.width = percent + "%";
+  if (score <= 2) {
+    strengthBar.style.background = "#dc3545"; // red
+  } else if (score === 3) {
+    strengthBar.style.background = "#ffc107"; // yellow
+  } else if (score >= 4) {
+    strengthBar.style.background = "#28a745"; // green
+  }
+});
+
+// Utility: Run once manually in console to create test user
+/*
+function createTestUser() {
+  const usersArr = [{
+    username: "admin",
+    email: "admin@example.com",
+    password: bcrypt.hashSync("password123", 10)
+  }];
+  localStorage.setItem("usersArr", JSON.stringify(usersArr));
+  console.log("Test user created: admin / admin@example.com / password123");
+}
+*/
   </script>
 </body>
 </html>
