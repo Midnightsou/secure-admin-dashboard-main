@@ -135,17 +135,21 @@
       }
       .card {
         padding: 24px 18px;
+        min-width: 0;
       }
     }
     @media (max-width: 600px) {
       .dashboard {
-        flex-direction: column;
+        flex-direction: column !important;
       }
       .sidebar {
         width: 100%;
-        flex-direction: row;
+        flex-direction: row !important;
         justify-content: space-between;
+        align-items: center;
         padding: 12px 0;
+        min-width: 0;
+        display: flex;
       }
       .sidebar h2 {
         font-size: 1.2rem;
@@ -156,66 +160,96 @@
         display: flex;
         flex-direction: row;
         width: auto;
+        margin: 0;
+        padding: 0;
       }
       .sidebar ul li {
         margin: 0 4px;
       }
-      .sidebar ul li a {
+      .sidebar ul li a,
+      .sidebar ul li button.logout {
         padding: 10px 12px;
         font-size: 0.97rem;
         border-left: none;
         border-bottom: 2px solid transparent;
+        width: auto;
+        min-width: 0;
+        text-align: center;
+        display: block;
       }
       .sidebar ul li a.active,
       .sidebar ul li a:hover {
         border-left: none;
         border-bottom: 2px solid #60a5fa;
       }
+      .main-content {
+        padding: 10px;
+      }
+      .cards {
+        flex-direction: column !important;
+        gap: 12px;
+      }
+      .card {
+        padding: 16px 8px;
+        font-size: 1rem;
+        min-width: 0;
+      }
+      .logs-list {
+        padding: 10px 6px;
+        font-size: 0.97rem;
+      }
     }
   </style>
 </head>
 <body>
   <div class="dashboard">
-    <aside class="sidebar">
-      <h2>Admin</h2>
+    <aside class="sidebar" aria-label="Main navigation">
+      <h2 id="sidebar-heading">Admin</h2>
       <ul>
-        <li><a href="dashboard.html" class="active">Dashboard</a></li>
+        <li><a href="dashboard.html" class="active" aria-current="page">Dashboard</a></li>
         <li><a href="users.html">Users</a></li>
         <li><a href="logs.html">Logs</a></li>
         <li><a href="settings.html">Settings</a></li>
-        <li><a href="#" id="logout" class="logout">Logout</a></li>
+        <li><a href="#" id="logout" class="logout" aria-label="Logout">Logout</a></li>
       </ul>
     </aside>
     <div class="main">
       <header class="navbar">
-        <h1>Dashboard</h1>
-        <span id="welcome-user"></span>
+        <h1 id="dashboard-title">Dashboard</h1>
+        <span id="welcome-user" aria-live="polite"></span>
       </header>
-      <main class="main-content">
-        <section class="cards">
-          <div class="card">
+      <main class="main-content" aria-labelledby="dashboard-title">
+        <section class="cards" aria-label="Summary cards">
+          <div class="card" tabindex="0" aria-label="Total users">
             <span>Users</span>
-            <strong id="users-count">0</strong>
+            <strong id="users-count" aria-live="polite">0</strong>
           </div>
-          <div class="card">
+          <div class="card" tabindex="0" aria-label="Total logs">
             <span>Logs</span>
-            <strong id="logs-count">0</strong>
+            <strong id="logs-count" aria-live="polite">0</strong>
           </div>
-          <div class="card">
+          <div class="card" tabindex="0" aria-label="Total errors">
             <span>Errors</span>
-            <strong id="errors-count" style="color:#dc3545;">0</strong>
+            <strong id="errors-count" style="color:#dc3545;" aria-live="polite">0</strong>
           </div>
         </section>
         <section style="margin-top:24px;">
-          <h2 class="section-title">Recent Logs</h2>
-          <ul id="logs-list" class="logs-list"></ul>
+          <h2 class="section-title" id="recent-logs-title">Recent Logs</h2>
+          <ul id="logs-list" class="logs-list" aria-labelledby="recent-logs-title"></ul>
         </section>
       </main>
     </div>
   </div>
 
-  <!-- Add this where you want the logout button to appear -->
-  <button id="logoutBtn">Logout</button>
+  <style>
+    .visually-hidden {
+      position: absolute !important;
+      height: 1px; width: 1px;
+      overflow: hidden;
+      clip: rect(1px, 1px, 1px, 1px);
+      white-space: nowrap;
+    }
+  </style>
 
   <script>
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || "null");
@@ -225,21 +259,16 @@
       window.location.href = "index.html";
     }
 
-
     // Welcome user
     document.getElementById('welcome-user').textContent = currentUser ? `Welcome, ${currentUser.username}` : "Welcome, Admin";
 
     // Logout
     document.getElementById('logout').addEventListener('click', function (e) {
       e.preventDefault();
-      localStorage.removeItem('currentUser');
-      window.location.href = "index.html";
-    });
-
-    // Remove current user and redirect to login
-    document.getElementById('logoutBtn').addEventListener('click', function () {
-      localStorage.removeItem('currentUser');
-      window.location.href = "index.html";
+      if (confirm("Are you sure you want to logout?")) {
+        localStorage.removeItem('currentUser');
+        window.location.href = "index.html";
+      }
     });
 
     // Load dashboard data
@@ -259,12 +288,20 @@
       if (logs.length > 0) {
         logs.slice(-10).reverse().forEach(log => {
           const li = document.createElement('li');
-          li.innerHTML = `<span style="color:#23272b;">${log.action}</span> <span style="color:#888;font-size:0.97em;">(${log.user || "system"} - ${new Date(log.time).toLocaleString()})</span>`;
+          li.innerHTML = `<span style="color:#23272b;">${escapeHTML(log.action)}</span> <span style="color:#888;font-size:0.97em;">(${escapeHTML(log.user || "system")} - ${new Date(log.time).toLocaleString()})</span>`;
           logsList.appendChild(li);
         });
       } else {
         logsList.innerHTML = '<li style="color:#888;">No logs yet.</li>';
       }
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>"']/g, function(m) {
+        return ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[m];
+      });
     }
 
     updateDashboard();

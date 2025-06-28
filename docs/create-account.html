@@ -104,38 +104,51 @@
       border-radius: 3px;
       transition: width 0.3s, background 0.3s;
     }
+
+    .visually-hidden {
+      position: absolute !important;
+      height: 1px; width: 1px;
+      overflow: hidden;
+      clip: rect(1px, 1px, 1px, 1px);
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
   <div class="card">
-    <form class="login-form" id="createAccountForm" autocomplete="off">
-      <h2>Create Admin Account</h2>
+    <form class="login-form" id="createAccountForm" autocomplete="off" aria-labelledby="createAccountHeading">
+      <h2 id="createAccountHeading">Create Admin Account</h2>
 
       <div class="input-group">
-        <i class="fa-solid fa-user"></i>
-        <input type="text" placeholder="Username" id="Username" required pattern="^[a-zA-Z0-9_]{3,}$" title="At least 3 characters, alphanumeric or underscores only." />
+        <i class="fa-solid fa-user" aria-hidden="true"></i>
+        <label for="Username" class="visually-hidden">Username</label>
+        <input type="text" placeholder="Username" id="Username" name="username" required pattern="^[a-zA-Z0-9_]{3,}$" title="At least 3 characters, alphanumeric or underscores only." aria-required="true" aria-label="Username" />
       </div>
 
       <div class="input-group">
-        <i class="fa-solid fa-envelope"></i>
-        <input type="email" placeholder="Email" id="Email" required />
+        <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+        <label for="Email" class="visually-hidden">Email</label>
+        <input type="email" placeholder="Email" id="Email" name="email" required aria-required="true" aria-label="Email" />
       </div>
 
       <div class="input-group">
-        <i class="fa-solid fa-lock"></i>
-        <input type="password" placeholder="Password" id="Password" required minlength="6" />
+        <i class="fa-solid fa-lock" aria-hidden="true"></i>
+        <label for="Password" class="visually-hidden">Password</label>
+        <input type="password" placeholder="Password" id="Password" name="password" required minlength="6" aria-required="true" aria-label="Password" />
       </div>
-      <div id="strengthMeter">
+      <div id="strengthMeter" aria-hidden="true">
         <div id="strengthBar"></div>
       </div>
+      <span id="strengthText" style="font-size:0.95em;display:block;margin-bottom:8px;color:#555;" aria-live="polite"></span>
 
       <div class="input-group">
-        <i class="fa-solid fa-lock"></i>
-        <input type="password" placeholder="Confirm Password" id="ConfirmPassword" required />
+        <i class="fa-solid fa-lock" aria-hidden="true"></i>
+        <label for="ConfirmPassword" class="visually-hidden">Confirm Password</label>
+        <input type="password" placeholder="Confirm Password" id="ConfirmPassword" name="confirmPassword" required aria-required="true" aria-label="Confirm Password" />
       </div>
 
       <div style="display:flex;align-items:center;gap:8px;">
-        <input type="checkbox" id="showPassword" />
+        <input type="checkbox" id="showPassword" aria-controls="Password ConfirmPassword" />
         <label for="showPassword" style="cursor:pointer;">Show Passwords</label>
       </div>
 
@@ -144,7 +157,7 @@
       <p>Already have an account? <a href="index.html">LOGIN</a></p>
       <p><a href="#" id="forgotPassword">Forgot Password?</a></p>
 
-      <p id="message"></p>
+      <p id="message" aria-live="polite"></p>
     </form>
   </div>
 
@@ -154,6 +167,7 @@
       const message = document.getElementById('message');
       const passwordInput = document.getElementById('Password');
       const strengthBar = document.getElementById('strengthBar');
+      const strengthText = document.getElementById('strengthText');
 
       passwordInput.addEventListener('input', function () {
         const val = passwordInput.value;
@@ -167,13 +181,21 @@
         // Set bar width and color
         const percent = (score / 5) * 100;
         strengthBar.style.width = percent + "%";
+        let text = "";
         if (score <= 2) {
           strengthBar.style.background = "#dc3545"; // red
+          text = "Weak";
+          strengthText.style.color = "#dc3545";
         } else if (score === 3) {
           strengthBar.style.background = "#ffc107"; // yellow
+          text = "Medium";
+          strengthText.style.color = "#ffc107";
         } else if (score >= 4) {
           strengthBar.style.background = "#28a745"; // green
+          text = "Strong";
+          strengthText.style.color = "#28a745";
         }
+        strengthText.textContent = val.length === 0 ? "" : `Strength: ${text}`;
       });
 
       // Show/Hide Password
