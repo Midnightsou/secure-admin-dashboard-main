@@ -5,71 +5,146 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Create Admin Account</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);
-      min-height: 100vh;
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    body {
       display: flex;
       justify-content: center;
       align-items: center;
+      min-height: 100vh;
+      background: url('/img/1.jpg') no-repeat center center / cover;
     }
 
-    .card {
-      background: #fff;
-      padding: 2.5rem 2rem;
-      border-radius: 18px;
-      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.18);
-      max-width: 500px;
-      width: 90%;
+    .wrapper {
+      width: 420px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      border-radius: 16px;
+      padding: 30px 40px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
     }
 
-    .login-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .login-form h2 {
+    .wrapper h2 {
       text-align: center;
-      color: #22223b;
+      font-size: 28px;
+      margin-bottom: 25px;
     }
 
-    .input-group {
+    .input-box {
       position: relative;
+      margin: 20px 0;
+      width: 100%;
+      height: 50px;
     }
 
-    .input-group input {
-      width: 80%;
-      padding: 0.75rem 0.75rem 0.75rem 2.5rem;
-      border-radius: 8px;
-      border: 1px solid #cbd5e1;
-      background: #f1f5f9;
-      font-size: 1rem;
+    .input-box input {
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 40px;
+      font-size: 16px;
+      color: white;
+      padding: 0 45px 0 20px;
+      outline: none;
+      transition: border 0.3s ease;
     }
 
-    .input-group .fa-solid {
+    .input-box input::placeholder {
+      color: white;
+      opacity: 0.7;
+    }
+
+    .input-box input:focus {
+      border-color: #ffffff;
+    }
+
+    .input-box i {
       position: absolute;
-      left: 0.9rem;
+      right: 20px;
       top: 50%;
       transform: translateY(-50%);
-      color: #6366f1;
+      font-size: 20px;
+      color: white;
     }
 
-    .login-form button {
-      padding: 0.8rem;
-      background: linear-gradient(90deg, #6366f1 0%, #60a5fa 100%);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      font-weight: 600;
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      margin-top: -10px;
+      margin-bottom: 20px;
+    }
+
+    .checkbox-container label {
       cursor: pointer;
     }
 
-    .login-form button:hover {
-      background: linear-gradient(90deg, #4f46e5 0%, #2563eb 100%);
+    .btn {
+      width: 100%;
+      height: 45px;
+      background: white;
+      color: #333;
+      border: none;
+      border-radius: 40px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #f0f0f0;
+      color: #111;
+    }
+
+    .links {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+
+    #strengthMeter {
+      height: 6px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    #strengthBar {
+      height: 100%;
+      width: 0%;
+      background: #dc3545;
+      border-radius: 4px;
+      transition: width 0.3s, background 0.3s;
+    }
+
+    #strengthText {
+      font-size: 0.95em;
+      margin-bottom: 8px;
+      color: #aaa;
     }
 
     #message {
@@ -79,83 +154,53 @@
       min-height: 1.5em;
     }
 
-    a {
-      color: #6366f1;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    /* Strength meter styles */
-    #strengthMeter {
-      height: 6px;
-      width: 100%;
-      background: #eee;
-      border-radius: 3px;
-      margin-bottom: 8px;
-    }
-
-    #strengthBar {
-      height: 100%;
-      width: 0%;
-      background: #dc3545;
-      border-radius: 3px;
-      transition: width 0.3s, background 0.3s;
-    }
-
     .visually-hidden {
-      position: absolute !important;
-      height: 1px; width: 1px;
-      overflow: hidden;
-      clip: rect(1px, 1px, 1px, 1px);
-      white-space: nowrap;
+      position: absolute;
+      left: -9999px;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <form class="login-form" id="createAccountForm" autocomplete="off" aria-labelledby="createAccountHeading">
+  <div class="wrapper">
+    <form id="createAccountForm" autocomplete="off" aria-labelledby="createAccountHeading">
       <h2 id="createAccountHeading">Create Admin Account</h2>
 
-      <div class="input-group">
-        <i class="fa-solid fa-user" aria-hidden="true"></i>
-        <label for="Username" class="visually-hidden">Username</label>
-        <input type="text" placeholder="Username" id="Username" name="username" required pattern="^[a-zA-Z0-9_]{3,}$" title="At least 3 characters, alphanumeric or underscores only." aria-required="true" aria-label="Username" />
+      <div class="input-box">
+        <input type="text" id="Username" placeholder="Username" name="username" required pattern="^[a-zA-Z][a-zA-Z0-9_]{2,}$" title="Start with a letter. At least 3 characters, alphanumeric or underscores only." />
+        <i class="fa-solid fa-user"></i>
       </div>
 
-      <div class="input-group">
-        <i class="fa-solid fa-envelope" aria-hidden="true"></i>
-        <label for="Email" class="visually-hidden">Email</label>
-        <input type="email" placeholder="Email" id="Email" name="email" required aria-required="true" aria-label="Email" />
+      <div class="input-box">
+        <input type="email" id="Email" placeholder="Email" name="email" required />
+        <i class="fa-solid fa-envelope"></i>
       </div>
 
-      <div class="input-group">
-        <i class="fa-solid fa-lock" aria-hidden="true"></i>
-        <label for="Password" class="visually-hidden">Password</label>
-        <input type="password" placeholder="Password" id="Password" name="password" required minlength="6" aria-required="true" aria-label="Password" />
+      <div class="input-box">
+        <input type="password" id="Password" placeholder="Password" name="password" required minlength="6" />
+        <i class="fa-solid fa-lock"></i>
       </div>
-      <div id="strengthMeter" aria-hidden="true">
+
+      <div id="strengthMeter">
         <div id="strengthBar"></div>
       </div>
-      <span id="strengthText" style="font-size:0.95em;display:block;margin-bottom:8px;color:#555;" aria-live="polite"></span>
+      <span id="strengthText" aria-live="polite"></span>
 
-      <div class="input-group">
-        <i class="fa-solid fa-lock" aria-hidden="true"></i>
-        <label for="ConfirmPassword" class="visually-hidden">Confirm Password</label>
-        <input type="password" placeholder="Confirm Password" id="ConfirmPassword" name="confirmPassword" required aria-required="true" aria-label="Confirm Password" />
+      <div class="input-box">
+        <input type="password" id="ConfirmPassword" placeholder="Confirm Password" name="confirmPassword" required />
+        <i class="fa-solid fa-lock"></i>
       </div>
 
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input type="checkbox" id="showPassword" aria-controls="Password ConfirmPassword" />
-        <label for="showPassword" style="cursor:pointer;">Show Passwords</label>
+      <div class="checkbox-container">
+        <input type="checkbox" id="showPassword" />
+        <label for="showPassword">Show Passwords</label>
       </div>
 
-      <button type="submit">Create Account</button>
+      <button type="submit" class="btn">Create Account</button>
 
-      <p>Already have an account? <a href="index.html">LOGIN</a></p>
-      <p><a href="#" id="forgotPassword">Forgot Password?</a></p>
+      <div class="links">
+        <p>Already have an account? <a href="index.html">Login</a></p>
+        <p><a href="#" id="forgotPassword">Forgot Password?</a></p>
+      </div>
 
       <p id="message" aria-live="polite"></p>
     </form>
@@ -178,38 +223,39 @@
         if (/\d/.test(val)) score++;
         if (/[^A-Za-z0-9]/.test(val)) score++;
 
-        // Set bar width and color
         const percent = (score / 5) * 100;
         strengthBar.style.width = percent + "%";
         let text = "";
         if (score <= 2) {
-          strengthBar.style.background = "#dc3545"; // red
+          strengthBar.style.background = "#dc3545";
           text = "Weak";
           strengthText.style.color = "#dc3545";
         } else if (score === 3) {
-          strengthBar.style.background = "#ffc107"; // yellow
+          strengthBar.style.background = "#ffc107";
           text = "Medium";
           strengthText.style.color = "#ffc107";
-        } else if (score >= 4) {
-          strengthBar.style.background = "#28a745"; // green
+        } else {
+          strengthBar.style.background = "#28a745";
           text = "Strong";
           strengthText.style.color = "#28a745";
         }
         strengthText.textContent = val.length === 0 ? "" : `Strength: ${text}`;
       });
 
-      // Show/Hide Password
       document.getElementById('showPassword').addEventListener('change', function () {
-        const pwd = document.getElementById('Password');
-        const cpwd = document.getElementById('ConfirmPassword');
-        pwd.type = cpwd.type = this.checked ? 'text' : 'password';
+        const type = this.checked ? 'text' : 'password';
+        document.getElementById('Password').type = type;
+        document.getElementById('ConfirmPassword').type = type;
       });
 
-      // Forgot Password Feature
       document.getElementById('forgotPassword').addEventListener('click', function (e) {
         e.preventDefault();
         const email = prompt("Enter your registered email:");
         if (!email) return;
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          alert("Invalid email format.");
+          return;
+        }
 
         const usersArr = JSON.parse(localStorage.getItem('usersArr') || "[]");
         const userIdx = usersArr.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
@@ -235,7 +281,6 @@
         alert("Password reset successfully!");
       });
 
-      // Handle Create Account
       form.addEventListener('submit', function (e) {
         e.preventDefault();
 
@@ -274,11 +319,9 @@
           return;
         }
 
-        // Save user (⚠️ password is plain text – only use this for demo/dev)
         usersArr.push({ username, email, password, role: 'admin' });
         localStorage.setItem('usersArr', JSON.stringify(usersArr));
 
-        // Log creation
         const logs = JSON.parse(localStorage.getItem('logs') || "[]");
         logs.push({ action: "Account created", user: username, time: new Date().toISOString() });
         localStorage.setItem('logs', JSON.stringify(logs));
