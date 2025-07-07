@@ -1,5 +1,5 @@
-const Admin = require("../models/admin.js");
-const Otp = require("../models/otp.js");
+const Admin = require("../models/Admin.js");
+const Otp = require("../models/Otp.js");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
