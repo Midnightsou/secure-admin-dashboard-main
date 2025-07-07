@@ -7,174 +7,226 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', sans-serif;
-    }
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
 
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background: url('/img/1.jpg') no-repeat center center / cover;
-    }
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Orbitron', sans-serif;
+  }
 
-    .card {
-      width: 420px;
-      background: rgba(0, 0, 0, 0.6);
-      color: white;
-      border-radius: 16px;
-      padding: 30px 40px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(10px);
-    }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: radial-gradient(circle at center, #000c1f, #000000);
+    color: #fff;
+    overflow: hidden;
+  }
 
-    .login-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
+  .wrapper {
+    width: 460px;
+    background: rgba(0, 255, 255, 0.05);
+    border: 2px solid rgba(0, 255, 255, 0.2);
+    border-radius: 18px;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    padding: 45px 40px;
+    animation: zoomIn 0.6s ease;
+    position: relative;
+    z-index: 1;
+  }
 
-    .login-form h2 {
-      text-align: center;
-      font-size: 28px;
-      margin-bottom: 10px;
+  @keyframes zoomIn {
+    from {
+      transform: scale(0.95);
+      opacity: 0;
     }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
 
-    .input-group {
-      position: relative;
-      width: 100%;
-    }
+  .wrapper::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #00f9ff, #006eff, #0f0, #ff00ff);
+    z-index: -1;
+    filter: blur(20px);
+    opacity: 0.2;
+    border-radius: 20px;
+    animation: neonBorder 5s linear infinite;
+  }
 
-    .input-group input {
-      width: 100%;
-      padding: 0.75rem 0.75rem 0.75rem 2.5rem;
-      border-radius: 40px;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      background: transparent;
-      font-size: 1rem;
-      color: white;
-      outline: none;
+  @keyframes neonBorder {
+    0% {
+      filter: hue-rotate(0deg);
     }
+    100% {
+      filter: hue-rotate(360deg);
+    }
+  }
 
-    .input-group input::placeholder {
-      color: white;
-      opacity: 0.7;
-    }
+  .wrapper h2 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 35px;
+    color: #00f9ff;
+    text-shadow: 0 0 5px #00f9ff;
+  }
 
-    .input-group input:focus {
-      border-color: #ffffff;
-      background: transparent;
-    }
+  .input-box {
+    position: relative;
+    margin-bottom: 25px;
+  }
 
-    .input-group .fa-solid {
-      position: absolute;
-      left: 0.9rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: white;
-      font-size: 1.1rem;
-    }
+  .input-box input {
+    width: 100%;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 12px;
+    color: #0ff;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
 
-    .login-form button {
-      padding: 0.8rem;
-      background: white;
-      color: #333;
-      border: none;
-      border-radius: 40px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.3s ease, color 0.3s ease;
-    }
+  .input-box input:focus {
+    outline: none;
+    border-color: #00f9ff;
+    box-shadow: 0 0 10px rgba(0, 249, 255, 0.3);
+    background-color: rgba(0, 255, 255, 0.08);
+  }
 
-    .login-form button:hover {
-      background: #f0f0f0;
-      color: #111;
-    }
+  .input-box input::placeholder {
+    color: rgba(0, 255, 255, 0.5);
+  }
 
-    .login-form p {
-      text-align: center;
-      font-size: 0.95rem;
-    }
+  .input-box i {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #0ff;
+    opacity: 0.6;
+  }
 
-    .login-form a {
-      color: white;
-      text-decoration: none;
-      font-weight: 500;
-    }
+  .checkbox-container {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    margin-bottom: 20px;
+    color: rgba(0, 255, 255, 0.8);
+  }
 
-    .login-form a:hover {
-      text-decoration: underline;
-    }
+  .checkbox-container input[type="checkbox"] {
+    margin-right: 10px;
+    accent-color: #00f9ff;
+  }
 
-    #login-message {
-      min-height: 1.2em;
-      font-weight: 500;
-      text-align: center;
-      margin-top: 0.5rem;
-      color: #dc3545;
-    }
+  .btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #00f9ff, #007cf0);
+    border: none;
+    border-radius: 14px;
+    color: #000;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
 
-    /* Password Strength Meter */
-    #strengthMeter {
-      height: 6px;
-      width: 100%;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 4px;
-      margin-top: -10px;
-      margin-bottom: 10px;
-      overflow: hidden;
-    }
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+  }
 
-    #strengthBar {
-      height: 100%;
-      width: 0%;
-      background: #dc3545;
-      border-radius: 4px;
-      transition: width 0.3s, background 0.3s;
-    }
+  .links {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 13px;
+  }
 
-    #strengthText {
-      font-size: 0.95em;
-      display: block;
-      margin-bottom: 8px;
-      color: #ccc;
-      text-align: center;
-    }
+  .links a {
+    color: #00f9ff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
 
-    .show-password {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: -8px;
-      font-size: 0.95rem;
-    }
+  .links a:hover {
+    color: #fff;
+    text-shadow: 0 0 5px #00f9ff;
+  }
 
-    .show-password label {
-      cursor: pointer;
+  #strengthMeter {
+    height: 6px;
+    background: rgba(0, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: -10px;
+    margin-bottom: 12px;
+  }
+
+  #strengthBar {
+    height: 100%;
+    width: 0%;
+    background: #ff4d4d;
+    transition: width 0.3s ease, background 0.3s ease;
+    border-radius: 4px;
+  }
+
+  #strengthText {
+    font-size: 13px;
+    color: #aaa;
+    margin-bottom: 10px;
+  }
+
+  #message {
+    text-align: center;
+    margin-top: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    min-height: 20px;
+  }
+
+  @media (max-width: 480px) {
+    .wrapper {
+      width: 92%;
+      padding: 40px 20px;
     }
-  </style>
+  }
+</style>
+
 </head>
 <body>
-  <div class="card">
+  <div class="wrapper">
     <form class="login-form" id="loginForm" autocomplete="off" aria-labelledby="loginHeading">
       <h2 id="loginHeading">Admin Login</h2>
 
-      <div class="input-group">
+      <div class="input-box">
         <i class="fa-solid fa-user"></i>
         <input type="text" placeholder="Username" id="Username" required />
       </div>
 
-      <div class="input-group">
+      <div class="input-box">
         <i class="fa-solid fa-envelope"></i>
         <input type="email" placeholder="Email" id="Email" required />
       </div>
 
-      <div class="input-group">
+      <div class="input-box">
         <i class="fa-solid fa-lock"></i>
         <input type="password" placeholder="Password" id="Password" required />
       </div>
@@ -184,33 +236,29 @@
       </div>
       <span id="strengthText" aria-live="polite"></span>
 
-      <div class="show-password">
+      <div class="checkbox-container">
         <input type="checkbox" id="showPassword" />
         <label for="showPassword">Show Password</label>
       </div>
 
-      <button type="submit">LOGIN</button>
+      <button class="btn" type="submit">LOGIN</button>
 
-      <p>Don't have an account? <a href="create-account.html">Create one</a></p>
-      <p><a href="#" id="forgotPassword">Forgot Password?</a></p>
+      <div class="links">
+        <p>Don't have an account? <a href="create-account.html">Create one</a></p>
+        <p><a href="#" id="forgotPassword">Forgot Password?</a></p>
+      </div>
 
       <p id="login-message" aria-live="polite"></p>
     </form>
   </div>
 
   <script>
-    const sha256 = async (msg) => {
-      const buffer = new TextEncoder().encode(msg);
-      const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-    };
-
     document.getElementById('showPassword').addEventListener('change', function () {
       const pwd = document.getElementById('Password');
       pwd.type = this.checked ? 'text' : 'password';
     });
 
-    document.getElementById('forgotPassword').addEventListener('click', async function (e) {
+    document.getElementById('forgotPassword').addEventListener('click', function (e) {
       e.preventDefault();
       const email = prompt("Enter your registered email:");
       if (!email) return;
@@ -222,19 +270,18 @@
       const newPass = prompt("New password (min 6 chars):");
       if (!newPass || newPass.length < 6) return alert("Password too short.");
 
-      usersArr[idx].password = await sha256(newPass);
+      usersArr[idx].password = newPass;
       localStorage.setItem('usersArr', JSON.stringify(usersArr));
 
       alert("Password reset.");
     });
 
-    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
       e.preventDefault();
 
       const username = document.getElementById('Username').value.trim().toLowerCase();
       const email = document.getElementById('Email').value.trim().toLowerCase();
       const password = document.getElementById('Password').value;
-      const hashedPassword = await sha256(password);
       const message = document.getElementById('login-message');
 
       const usersArr = JSON.parse(localStorage.getItem('usersArr') || "[]");
@@ -242,6 +289,7 @@
 
       if (!user) {
         message.textContent = "Invalid username or email.";
+        message.style.color = "#dc3545";
         return;
       }
 
@@ -251,10 +299,11 @@
       if (user.lockoutUntil && new Date() < new Date(user.lockoutUntil)) {
         const mins = Math.ceil((new Date(user.lockoutUntil) - new Date()) / 60000);
         message.textContent = `Account locked. Try again in ${mins} min.`;
+        message.style.color = "#dc3545";
         return;
       }
 
-      if (user.password !== hashedPassword) {
+      if (user.password !== password) {
         user.failedAttempts += 1;
         if (user.failedAttempts >= 5) {
           user.lockoutUntil = new Date(Date.now() + 5 * 60 * 1000);
@@ -262,6 +311,7 @@
         } else {
           message.textContent = `Incorrect password. ${5 - user.failedAttempts} attempt(s) left.`;
         }
+        message.style.color = "#dc3545";
         localStorage.setItem('usersArr', JSON.stringify(usersArr));
         return;
       }
